@@ -1,34 +1,38 @@
-<svelte:options tag="my-app"/>
+<svelte:options tag="servender-microfront-window"/>
 
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import logo from './assets/svelte.png';
-  import './lib/Counter.svelte';
+  import { getContext, setContext } from 'svelte';
+  import { v4 as uuidv4 } from 'uuid';
+  import type { Widget } from 'types';
 
-  onMount(() => {
-    console.log(333333);
-    //@ts-ignore
-    window.test = 33333;
-  });
+  import './components/Wrapper/Wrapper.svelte';
+
+  const contextId = uuidv4();
+  const defaultComponentId = uuidv4();
+
+  const getContextData = (): Widget.ContextData => {
+    return {
+      props: {
+        type: $$props.type || 'component',
+        id: $$props.id || defaultComponentId,
+        resize: $$props.resize || true, //false
+        resizeType: $$props.resizeType || 'size', //size
+        move: $$props.move || false, //false
+      }
+    }
+  }
+
+  $: setContext(contextId, getContextData());
+
+  $: context = getContext<Widget.ContextData>(contextId);
+
+  $: console.log('global_context', context);
 </script>
 
 <main>
-  <img src={logo} alt="Svelte Logo" />
-  <h1>Hello Typescript!</h1>
-
-  <my-counter></my-counter>
-
-  <iframe src="javascript:''" style="height:80px" title="test_iframe" name="i"></iframe>
-
-  <p>
-    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
-    apps.
-  </p>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
-    the officially supported framework, also powered by Vite!
-  </p>
+  <servender-microfront-window-wrapper contextid={contextId}>
+    <div style="width: 300px; height: 300px">ffff</div>
+  </servender-microfront-window-wrapper>
 </main>
 
 <style>
@@ -41,36 +45,5 @@
     text-align: center;
     padding: 1em;
     margin: 0 auto;
-  }
-
-  img {
-    height: 16rem;
-    width: 16rem;
-  }
-
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
-
-  p {
-    max-width: 14rem;
-    margin: 1rem auto;
-    line-height: 1.35;
-  }
-
-  @media (min-width: 480px) {
-    h1 {
-      max-width: none;
-    }
-
-    p {
-      max-width: none;
-    }
   }
 </style>
